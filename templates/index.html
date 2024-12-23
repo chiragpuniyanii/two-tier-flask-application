@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flask & MySQL Application</title>
+    <style>
+        /* Global Styles */
+        body, h1, p, form, input {
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: #1e1e2f;
+            color: #e0e0e0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        /* Container Styles */
+        .container {
+            max-width: 600px;
+            width: 100%;
+            background: linear-gradient(135deg, #2c2c54, #1e1e2f);
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+            text-align: center;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .container:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 24px rgba(0, 0, 0, 0.4);
+        }
+
+        h1 {
+            color: #ff6f61;
+            margin-bottom: 20px;
+            font-size: 2.2rem;
+            text-transform: uppercase;
+        }
+
+        p {
+            color: #bcbcbc;
+            margin-bottom: 15px;
+            font-size: 1rem;
+        }
+
+        /* Messages Styles */
+        .messages {
+            margin: 20px 0;
+            padding: 10px;
+            background-color: #2a2a40;
+            border-radius: 8px;
+            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        .messages p {
+            margin: 5px 0;
+            padding: 10px;
+            background-color: #3a3a50;
+            color: #ffeb3b;
+            border-radius: 6px;
+            transition: transform 0.3s;
+        }
+
+        .messages p:hover {
+            transform: scale(1.05);
+        }
+
+        /* Form Styles */
+        form {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        input[type="text"] {
+            padding: 12px;
+            border: 1px solid #444;
+            background-color: #3a3a50;
+            color: #fff;
+            border-radius: 6px;
+            font-size: 1rem;
+            outline: none;
+            transition: border-color 0.3s, box-shadow 0.3s;
+        }
+
+        input[type="text"]:focus {
+            border-color: #ff6f61;
+            box-shadow: 0 0 10px rgba(255, 111, 97, 0.4);
+        }
+
+        input[type="submit"] {
+            padding: 12px 16px;
+            background: linear-gradient(135deg, #ff6f61, #ff3d47);
+            color: white;
+            font-size: 1rem;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: transform 0.3s, background 0.3s;
+        }
+
+        input[type="submit"]:hover {
+            background: linear-gradient(135deg, #ff3d47, #ff6f61);
+            transform: translateY(-3px);
+        }
+
+        input[type="submit"]:active {
+            transform: translateY(0);
+        }
+
+        /* Success Message */
+        .success {
+            margin-top: 10px;
+            color: #4caf50;
+            font-size: 0.9rem;
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+
+        /* Responsive Styles */
+        @media (max-width: 600px) {
+            .container {
+                padding: 20px;
+            }
+
+            h1 {
+                font-size: 1.8rem;
+            }
+
+            input[type="text"], input[type="submit"] {
+                font-size: 0.9rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>Welcome to Flask & MySQL App</h1>
+        <p>Manage your application messages effectively with Flask and MySQL.</p>
+
+        <!-- Dynamic Message Display -->
+        <div class="messages">
+            {% for message in messages %}
+                <p>{{ message[0] }}</p>
+            {% endfor %}
+        </div>
+
+        <!-- Input Form -->
+        <form id="messageForm">
+            <input type="text" name="new_message" placeholder="Type your message here..." required>
+            <input type="submit" value="Add Message">
+        </form>
+
+        <!-- Success Message -->
+        <div id="successMessage" class="success" style="display: none;">
+            Message added successfully!
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            $("#messageForm").on("submit", function (event) {
+                event.preventDefault();
+
+                // AJAX request to send form data
+                $.ajax({
+                    url: "/submit",
+                    type: "POST",
+                    data: {
+                        new_message: $("input[name='new_message']").val()
+                    },
+                    success: function (response) {
+                        if (response && response.message) {
+                            $(".messages").append("<p>" + response.message + "</p>");
+                            $("input[name='new_message']").val(""); // Clear input
+
+                            // Show success message
+                            $("#successMessage").fadeIn().delay(2000).fadeOut();
+                        } else {
+                            console.error("Unexpected response:", response);
+                        }
+                    },
+                    error: function (xhr, status, error) {
+                        console.error("AJAX error:", status, error);
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+
+</html>

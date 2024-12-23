@@ -1,5 +1,5 @@
-# Two-tier-flask-application
-This repository contains a two-tier application built using Flask (backend) and MySQL (database), deployed using Docker on port `5000`. The application utilizes Docker's bridge network to connect the Flask and MySQL containers.
+# Flask and MySQL Two-Tier Application on AWS EC2 with Docker Volumes
+This repository contains a two-tier application built using Flask (backend) and MySQL (database), deployed using Docker on an AWS EC2 instance. The application runs on port `5000` and uses Docker's bridge network for communication between containers. Additionally, a Docker volume is configured for the MySQL container to ensure data persistence in case of crashes or container restarts.
 
 ## Features
 
@@ -7,6 +7,7 @@ This repository contains a two-tier application built using Flask (backend) and 
 - **MySQL**: Relational database for storing application data.
 - **Docker**: Containerized deployment for Flask and MySQL.
 - **Bridge Network**: Secure and efficient communication between Flask and MySQL containers.
+- **Docker Volume**: Persistent storage for MySQL data.
 - **AWS EC2**: Host the application on a cloud instance.
 
 ---
@@ -54,13 +55,21 @@ Set up a Docker bridge network for communication between containers:
 docker network create two-tier -d bridge
 ```
 
-### 6. Run the MySQL Container
+### 6. Create a Docker Volume for MySQL
+Create a volume to persist MySQL data:
+
+```bash
+docker volume create mysql-data
+```
+
+### 7. Run the MySQL Container
 Run the MySQL container with appropriate environment variables:
 
 ```bash
 docker pull mysql
-docker run -d --name mysql --network two-tier -e MYSQL_ROOT_PASSWORD=chirag -e MYSQL_DATABASE=chirag mysql
+docker run -d --name mysql --network two-tier -v mysql-data:/var/lib/mysql -e MYSQL_ROOT_PASSWORD=chirag -e MYSQL_DATABASE=chirag mysql
 ```
+  - -v mysql-data:/var/lib/mysql: Maps the mysql-data volume to the MySQL data directory inside the container.
 
 ### 7. Build and Run the Flask Container
 Build the Flask container using the Dockerfile:
@@ -88,6 +97,7 @@ Open your browser and navigate to http://<your-ec2-public-ip>:5000.
 
   - Stores application data.
   - Connects with Flask using the bridge network.
+  - Data is persisted in the mysql-data volume, ensuring no data loss in case of crashes or restarts.
 
 
 ## Prerequisites
@@ -98,6 +108,8 @@ Open your browser and navigate to http://<your-ec2-public-ip>:5000.
 ## Troubleshooting
   - Docker Permission Error: Ensure the ubuntu user is added to the docker group.
   - Port Access: Verify that port 5000 is open in the AWS Security Group.
+  - MySQL Volume Issue: Check if the volume is correctly attached and accessible.
+
 
 ## Future Enhancements
   - Add a frontend for the application.

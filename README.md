@@ -73,6 +73,9 @@ docker run -d -p 5000:5000 --network two-tier -e MYSQL_HOST=mysql -e MYSQL_USER=
 
 ### 8. Access the Application
 Open your browser and navigate to http://<your-ec2-public-ip>:5000.
+![image](https://github.com/user-attachments/assets/06761d6f-14bd-4cc7-bfde-7b5b8b542c90)
+
+
 
 
 ## Application Architecture
